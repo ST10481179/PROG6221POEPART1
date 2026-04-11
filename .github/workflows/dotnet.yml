@@ -20,7 +20,7 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore CyberSecurityChatbot/CyberSecurityChatbot.csproj
+        run: dotnet restore CyberSecurityChatbot.csproj
 
       - name: Build
-        run: dotnet build CyberSecurityChatbot/CyberSecurityChatbot.csproj --configuration Release --no-restore
+        run: dotnet build CyberSecurityChatbot.csproj --configuration Release --no-restore
