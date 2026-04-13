@@ -32,7 +32,7 @@ This README includes a screenshot of a successful GitHub Actions workflow run sh
 
 Task 1 should be submitted as a YouTube unlisted link. Include the unlisted video URL here once the recording is complete.
 
-- Presentation link: _Add YouTube unlisted link here_
+- Presentation link: https://youtu.be/OmiRFFJdaC8
 
 ## Audio greeting
 
