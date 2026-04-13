@@ -17,8 +17,22 @@ A C# console chatbot that provides cybersecurity guidance with a voice greeting,
 1. Open the project folder in VS Code.
 2. Build and run with:
    ```bash
-   dotnet run --project CyberSecurityChatbot/CyberSecurityChatbot.csproj
+   dotnet run --project CyberSecurityChatbot.csproj
    ```
+
+## Continuous integration
+
+This README includes a screenshot of a successful GitHub Actions workflow run showing the green check mark.
+
+> Add the screenshot file to the repository as `github-actions-success.png` and keep this image reference here.
+
+![GitHub Actions successful build screenshot](./github-actions-success.png)
+
+## Presentation submission
+
+Task 1 should be submitted as a YouTube unlisted link. Include the unlisted video URL here once the recording is complete.
+
+- Presentation link: _Add YouTube unlisted link here_
 
 ## Audio greeting
 

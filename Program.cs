@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Runtime.Versioning;
 
 namespace CyberSecurityChatbot
 {
     internal static class Program
     {
+        [SupportedOSPlatform("windows")]
         private static void Main()
         {
             Console.Title = "CyberSecurity Awareness Bot";

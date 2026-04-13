@@ -1,11 +1,13 @@
 using System;
 using System.IO;
 using System.Media;
+using System.Runtime.Versioning;
 
 namespace CyberSecurityChatbot
 {
     internal static class AudioPlayer
     {
+        [SupportedOSPlatform("windows")]
         public static void PlayGreeting()
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Greeting.wav");

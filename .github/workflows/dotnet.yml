@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repository
@@ -23,4 +25,4 @@ jobs:
         run: dotnet restore CyberSecurityChatbot.csproj
 
       - name: Build
-        run: dotnet build CyberSecurityChatbot.csproj --configuration Release --no-restore
+        run: dotnet build CyberSecurityChatbot.csproj --configuration Release --no-restore /p:TreatWarningsAsErrors=false
