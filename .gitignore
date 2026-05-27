@@ -8,3 +8,5 @@ obj/
 **/bin/
 **/obj/
 GeneratedAssets/
+chatbot.db
+*.db

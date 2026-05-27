@@ -113,10 +113,6 @@ namespace CyberSecurityChatbot
         {
             var response = ChatLogic.GetResponse(_user, text);
             TypingWrite(response);
-            
-            var response = ChatLogic.GetResponse(_user, text);
-            TypingWrite(response);
->>>>>>> 431d709 (Add EF Core persistence, entities, README and persistence wiring)
             Console.WriteLine();
         }
 

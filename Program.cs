@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Versioning;
 using System.Windows;
 using Microsoft.EntityFrameworkCore;
@@ -13,67 +14,18 @@ namespace CyberSecurityChatbot
         [STAThread]
         private static void Main(string[] args)
         {
-            // configure EF Core with a local SQLite file
             var options = new DbContextOptionsBuilder<AppDbContext>()
                 .UseSqlite("Data Source=chatbot.db")
                 .Options;
 
-            User user = new User();
-
-            // create or open DB and load the first user if present
-            using (var db = new AppDbContext(options))
-            {
-                db.Database.EnsureCreated();
-
-                var saved = db.Users.AsNoTracking().FirstOrDefault();
-                if (saved == null)
-                {
-                    saved = new UserEntity { Name = string.Empty };
-                    db.Users.Add(saved);
-                    db.SaveChanges();
-                }
-
-                // map persisted values into runtime User instance
-                if (!string.IsNullOrWhiteSpace(saved.Name)) user.Name = saved.Name;
-                user.LastTopic = saved.LastTopic ?? string.Empty;
-                user.FavoriteTopic = saved.FavoriteTopic ?? string.Empty;
-
-                foreach (var m in saved.Memory ?? new System.Collections.Generic.List<string>())
-                {
-                    user.Remember(m);
-                }
-
-                foreach (var i in saved.Interests ?? new System.Collections.Generic.List<string>())
-                {
-                    user.RememberInterest(i);
-                }
-            }
+            var user = LoadUser(options);
 
             if (args is null || args.Length == 0 || args[0].ToLowerInvariant() == "-gui")
             {
                 var app = new Application();
                 var main = new MainWindow(user);
                 app.Run(main);
-
-                // save user state after GUI closes
-                using (var db = new AppDbContext(options))
-                {
-                    var existing = db.Users.FirstOrDefault();
-                    if (existing == null)
-                    {
-                        existing = new UserEntity();
-                        db.Users.Add(existing);
-                    }
-
-                    existing.Name = user.Name ?? string.Empty;
-                    existing.LastTopic = user.LastTopic ?? string.Empty;
-                    existing.FavoriteTopic = user.FavoriteTopic ?? string.Empty;
-                    existing.Memory = new System.Collections.Generic.List<string>(user.GetMemoryList());
-                    existing.Interests = new System.Collections.Generic.List<string>(user.GetInterestsList());
-
-                    db.SaveChanges();
-                }
-
+                SaveUser(options, user);
                 return;
             }
 
@@ -87,134 +39,65 @@ namespace CyberSecurityChatbot
 
                 var bot = new Chatbot(user);
                 bot.Run();
-
-                // save user state after console run
-                using (var db = new AppDbContext(options))
-                {
-                    var existing = db.Users.FirstOrDefault();
-                    if (existing == null)
-                    {
-                        existing = new UserEntity();
-                        db.Users.Add(existing);
-                    }
-
-                    existing.Name = user.Name ?? string.Empty;
-                    existing.LastTopic = user.LastTopic ?? string.Empty;
-                    existing.FavoriteTopic = user.FavoriteTopic ?? string.Empty;
-                    existing.Memory = new System.Collections.Generic.List<string>(user.GetMemoryList());
-                    existing.Interests = new System.Collections.Generic.List<string>(user.GetInterestsList());
-
-                    db.SaveChanges();
-                }
-
+                SaveUser(options, user);
                 return;
             }
 
             var guiApp = new Application();
             guiApp.Run(new MainWindow(user));
-        [STAThread]
-        private static void Main(string[] args)
+            SaveUser(options, user);
+        }
+
+        private static User LoadUser(DbContextOptions<AppDbContext> options)
         {
-            // configure EF Core with a local SQLite file
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlite("Data Source=chatbot.db")
-                .Options;
+            using var db = new AppDbContext(options);
+            db.Database.Migrate();
 
-            User user = new User();
-
-            // create or open DB and load the first user if present
-            using (var db = new AppDbContext(options))
+            var saved = db.Users.AsNoTracking().FirstOrDefault();
+            if (saved == null)
             {
-                db.Database.EnsureCreated();
-
-                var saved = db.Users.AsNoTracking().FirstOrDefault();
-                if (saved == null)
-                {
-                    saved = new UserEntity { Name = string.Empty };
-                    db.Users.Add(saved);
-                    db.SaveChanges();
-                }
-
-                // map persisted values into runtime User instance
-                if (!string.IsNullOrWhiteSpace(saved.Name)) user.Name = saved.Name;
-                user.LastTopic = saved.LastTopic ?? string.Empty;
-                user.FavoriteTopic = saved.FavoriteTopic ?? string.Empty;
-
-                foreach (var m in saved.Memory ?? new System.Collections.Generic.List<string>())
-                {
-                    user.Remember(m);
-                }
-
-                foreach (var i in saved.Interests ?? new System.Collections.Generic.List<string>())
-                {
-                    user.RememberInterest(i);
-                }
+                saved = new UserEntity { Name = string.Empty };
+                db.Users.Add(saved);
+                db.SaveChanges();
             }
 
-            if (args is null || args.Length == 0 || args[0].ToLowerInvariant() == "-gui")
+            var user = new User
             {
-                var app = new Application();
-                var main = new MainWindow(user);
-                app.Run(main);
+                Name = saved.Name ?? string.Empty,
+                LastTopic = saved.LastTopic ?? string.Empty,
+                FavoriteTopic = saved.FavoriteTopic ?? string.Empty
+            };
 
-                // save user state after GUI closes
-                using (var db = new AppDbContext(options))
-                {
-                    var existing = db.Users.FirstOrDefault();
-                    if (existing == null)
-                    {
-                        existing = new UserEntity();
-                        db.Users.Add(existing);
-                    }
-
-                    existing.Name = user.Name ?? string.Empty;
-                    existing.LastTopic = user.LastTopic ?? string.Empty;
-                    existing.FavoriteTopic = user.FavoriteTopic ?? string.Empty;
-                    existing.Memory = new System.Collections.Generic.List<string>(user.GetMemoryList());
-                    existing.Interests = new System.Collections.Generic.List<string>(user.GetInterestsList());
-
-                    db.SaveChanges();
-                }
-
-                return;
+            foreach (var memory in saved.Memory ?? new System.Collections.Generic.List<string>())
+            {
+                user.Remember(memory);
             }
 
-            if (args[0].ToLowerInvariant() == "-console")
+            foreach (var interest in saved.Interests ?? new System.Collections.Generic.List<string>())
             {
-                Console.Title = "CyberSecurity Awareness Bot";
-                Console.OutputEncoding = System.Text.Encoding.UTF8;
-                Console.Clear();
-                Chatbot.DisplayAsciiBanner();
-                AudioPlayer.PlayGreeting();
-
-                var bot = new Chatbot(user);
-                bot.Run();
-
-                // save user state after console run
-                using (var db = new AppDbContext(options))
-                {
-                    var existing = db.Users.FirstOrDefault();
-                    if (existing == null)
-                    {
-                        existing = new UserEntity();
-                        db.Users.Add(existing);
-                    }
-
-                    existing.Name = user.Name ?? string.Empty;
-                    existing.LastTopic = user.LastTopic ?? string.Empty;
-                    existing.FavoriteTopic = user.FavoriteTopic ?? string.Empty;
-                    existing.Memory = new System.Collections.Generic.List<string>(user.GetMemoryList());
-                    existing.Interests = new System.Collections.Generic.List<string>(user.GetInterestsList());
-
-                    db.SaveChanges();
-                }
-
-                return;
+                user.RememberInterest(interest);
             }
 
-            var guiApp = new Application();
-            guiApp.Run(new MainWindow(user));
->>>>>>> 431d709 (Add EF Core persistence, entities, README and persistence wiring)
+            return user;
+        }
+
+        private static void SaveUser(DbContextOptions<AppDbContext> options, User user)
+        {
+            using var db = new AppDbContext(options);
+            var existing = db.Users.FirstOrDefault();
+            if (existing == null)
+            {
+                existing = new UserEntity();
+                db.Users.Add(existing);
+            }
+
+            existing.Name = user.Name ?? string.Empty;
+            existing.LastTopic = user.LastTopic ?? string.Empty;
+            existing.FavoriteTopic = user.FavoriteTopic ?? string.Empty;
+            existing.Memory = new System.Collections.Generic.List<string>(user.GetMemoryList());
+            existing.Interests = new System.Collections.Generic.List<string>(user.GetInterestsList());
+
+            db.SaveChanges();
         }
     }
 }

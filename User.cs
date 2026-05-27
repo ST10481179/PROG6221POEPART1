@@ -1,20 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+
 namespace CyberSecurityChatbot
 {
     internal class User
     {
         public string Name { get; set; } = string.Empty;
 
-        public List<string> Memory { get; } = new();
-
-        public List<string> Interests { get; } = new();
-
-        public string LastTopic { get; set; } = string.Empty;
-
-        public string FavoriteTopic { get; set; } = string.Empty;
-
-        public bool HasName => !string.IsNullOrWhiteSpace(Name);
         public List<string> Memory { get; } = new();
 
         public List<string> Interests { get; } = new();

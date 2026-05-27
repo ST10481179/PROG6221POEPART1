@@ -1,12 +1,6 @@
 # CyberSecurityChatbot
 
-<<<<<<< HEAD
-A C# console chatbot that provides cybersecurity guidance with a voice greeting, ASCII banner, personalized user interaction, and enhanced console styling.
-
-
-# CyberSecurityChatbot
-
-A simple WPF/.NET console chatbot that provides cybersecurity tips (passwords, phishing, malware, VPNs, privacy).
+A simple WPF/.NET chatbot that provides cybersecurity tips about passwords, phishing, malware, VPNs, privacy, and account security.
 
 ## Run
 
@@ -23,43 +17,41 @@ dotnet run --project "CyberSecurityChatbot.csproj" -c Debug
 dotnet run --project "CyberSecurityChatbot.csproj" -c Debug -- -console
 ```
 
-## Persistence
+## Features
 
-The app uses EF Core with SQLite (`chatbot.db`) to persist a single user profile (name, memory, interests).
+- WPF GUI plus console mode support
+- Personalized responses with user name
+- Cybersecurity advice for common topics
+- EF Core + SQLite persistence for user memory and interests
+- Automatic database migrations on startup
 
-## YouTube Demo
+## EF Core Migrations
 
-Add your YouTube link here:
+This project is configured to use EF Core migrations.
 
-YouTube: <PLACEHOLDER_FOR_YOUTUBE_LINK>
+Install the EF CLI if needed:
 
-## Suggestions / Polishing
-
-- Add DI and repository layer for cleaner persistence.
-- Add migrations (`dotnet ef migrations add InitialCreate`) for schema management.
-- Improve UI in `MainWindow.xaml` and add settings page.
-- Add unit tests for `ChatLogic`.
-
-I applied some immediate polish: integrated EF Core (SQLite) for persistence and autosave on exit.
-
-If you want, I can:
-- Create GitHub Releases and push tags (requires authenticated git credentials on this machine).
-- Add EF migrations and a README section with `dotnet ef` commands.
----
-
-Generated/updated by assistant to prepare for release.
-dotnet build "CyberSecurityChatbot.csproj" -c Debug
-
-# run GUI (default)
-dotnet run --project "CyberSecurityChatbot.csproj" -c Debug
-
-# run console mode
-dotnet run --project "CyberSecurityChatbot.csproj" -c Debug -- -console
+```powershell
+dotnet tool install --global dotnet-ef
 ```
 
+Create the initial migration:
+
+```powershell
+dotnet ef migrations add InitialCreate --project CyberSecurityChatbot.csproj
+```
+
+Apply the migration and create the database:
+
+```powershell
+dotnet ef database update --project CyberSecurityChatbot.csproj
+```
+
+The app will also apply pending migrations automatically when it starts.
+
 ## Persistence
 
-The app uses EF Core with SQLite (`chatbot.db`) to persist a single user profile (name, memory, interests).
+The SQLite database file `chatbot.db` stores one user profile and its memory entries and interests.
 
 ## YouTube Demo
 
@@ -69,19 +61,11 @@ YouTube: <PLACEHOLDER_FOR_YOUTUBE_LINK>
 
 ## Suggestions / Polishing
 
-- Add DI and repository layer for cleaner persistence.
-- Add migrations (`dotnet ef migrations add InitialCreate`) for schema management.
-- Improve UI in `MainWindow.xaml` and add settings page.
-- Add unit tests for `ChatLogic`.
-
-I applied some immediate polish: integrated EF Core (SQLite) for persistence and autosave on exit.
-
-If you want, I can:
-- Create GitHub Releases and push tags (requires authenticated git credentials on this machine).
-- Add EF migrations and a README section with `dotnet ef` commands.
-
+- Add unit tests for `ChatLogic` and persistence.
+- Improve the WPF UI in `MainWindow.xaml`.
+- Add a settings screen or saved conversation history.
+- Add a release notes section and GitHub release automation.
 
 ---
 
-Generated/updated by assistant to prepare for release.
->>>>>>> 431d709 (Add EF Core persistence, entities, README and persistence wiring)
+Generated/updated by assistant to prepare this project for release.
