@@ -61,7 +61,14 @@ namespace CyberSecurityChatbot
 
         private void UpdateInputHint()
         {
-          
+            if (_awaitingName)
+            {
+                InputTextBox.ToolTip = "Enter your name and press Send";
+            }
+            else
+            {
+                InputTextBox.ToolTip = "Type a cybersecurity question and press Send";
+            }
         }
     }
 }
