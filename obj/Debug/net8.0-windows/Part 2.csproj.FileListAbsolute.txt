@@ -1,0 +1,10 @@
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\App.g.cs
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\Part 2_MarkupCompile.cache
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\MainWindow.baml
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\App.baml
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\MainWindow.g.cs
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\Part 2.g.resources
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\Part 2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\Part 2.AssemblyInfoInputs.cache
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\Part 2.AssemblyInfo.cs
+C:\Users\tanki\source\repos\Part 2\Part 2\obj\Debug\net8.0-windows\Part 2.csproj.CoreCompileInputs.cache

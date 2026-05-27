@@ -111,45 +111,12 @@ namespace CyberSecurityChatbot
 
         private void RespondTo(string text)
         {
-            var normalized = text.ToLowerInvariant();
-
-            if (normalized.Contains("how are you"))
-            {
-                TypingWrite("I am fully operational and ready to keep you safe.");
-            }
-            else if (normalized.Contains("purpose") || normalized.Contains("what do you do") || normalized.Contains("what is your purpose"))
-            {
-                TypingWrite("My purpose is to help you learn cybersecurity best practices and stay protected online.");
-            }
-            else if (normalized.Contains("password"))
-            {
-                TypingWrite("Use a long, unique password for each account, enable multi-factor authentication, and store passwords in a password manager.");
-            }
-            else if (normalized.Contains("phishing"))
-            {
-                TypingWrite("Phishing attacks use fake emails and links. Always verify the sender, hover over links, and never share your password.");
-            }
-            else if (normalized.Contains("vpn"))
-            {
-                TypingWrite("A VPN helps protect your data on public Wi-Fi by encrypting your connection. Use one from a trusted provider.");
-            }
-            else if (normalized.Contains("malware") || normalized.Contains("virus") || normalized.Contains("ransomware"))
-            {
-                TypingWrite("Malware is harmful software. Keep your system updated, install antivirus software, and avoid downloading unknown files.");
-            }
-            else if (normalized.Contains("two-factor") || normalized.Contains("2fa") || normalized.Contains("multi-factor"))
-            {
-                TypingWrite("Two-factor authentication adds a second layer of protection beyond your password. Always enable it when available.");
-            }
-            else if (normalized.Contains("help"))
-            {
-                TypingWrite("Ask me anything about cybersecurity: password safety, phishing, malware, VPNs, and how to protect your accounts.");
-            }
-            else
-            {
-                TypingWrite("That question is new to me. Try asking about passwords, phishing, malware, VPNs, or account safety.");
-            }
-
+            var response = ChatLogic.GetResponse(_user, text);
+            TypingWrite(response);
+            
+            var response = ChatLogic.GetResponse(_user, text);
+            TypingWrite(response);
+>>>>>>> 431d709 (Add EF Core persistence, entities, README and persistence wiring)
             Console.WriteLine();
         }
 
