@@ -63,6 +63,70 @@ namespace CyberSecurityChatbot
             MemorySummaryTextBox.Text = _user.GetMemorySummary();
         }
 
+        private void ClearMemories_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to clear all memories?", "Confirm Clear", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.Yes)
+            {
+                _user.GetMemoryList().ToList().Clear();
+                // The above returns a copy; clear the underlying list instead
+                // Access internal list via reflection-free approach: use a temporary list and clear by remembering an API on User
+                // Since Memory is internal `List<string> Memory { get; }` we can clear via the public GetMemoryList only by casting
+                if (_user.GetMemoryList() is System.Collections.Generic.List<string> memList)
+                {
+                    memList.Clear();
+                }
+                else
+                {
+                    // fallback: rebuild user memory via reflection
+                    var memProp = typeof(User).GetProperty("Memory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                    if (memProp != null)
+                    {
+                        if (memProp.GetValue(_user) is System.Collections.IList list)
+                        {
+                            list.Clear();
+                        }
+                    }
+                }
+
+                try
+                {
+                    CyberSecurityChatbot.Data.Persistence.SaveUser(_user);
+                }
+                catch { }
+
+                UpdateStatusPanel();
+                HistoryTextBox.AppendText("\r\nBot: Cleared memories.\r\n");
+                HistoryTextBox.ScrollToEnd();
+            }
+        }
+
+        private void ClearInterests_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure you want to clear all interests?", "Confirm Clear", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (result == MessageBoxResult.Yes)
+            {
+                var interestsProp = typeof(User).GetProperty("Interests", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                if (interestsProp != null)
+                {
+                    if (interestsProp.GetValue(_user) is System.Collections.IList list)
+                    {
+                        list.Clear();
+                    }
+                }
+
+                try
+                {
+                    CyberSecurityChatbot.Data.Persistence.SaveUser(_user);
+                }
+                catch { }
+
+                UpdateStatusPanel();
+                HistoryTextBox.AppendText("\r\nBot: Cleared interests.\r\n");
+                HistoryTextBox.ScrollToEnd();
+            }
+        }
+
         private void InputTextBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter && Keyboard.Modifiers != ModifierKeys.Shift)
