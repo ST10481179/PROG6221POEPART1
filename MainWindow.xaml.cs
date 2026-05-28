@@ -18,7 +18,8 @@ namespace CyberSecurityChatbot
         public MainWindow(User user)
         {
             _user = user;
-            _awaitingName = !user.HasName;
+            // Always ask for the user's name on startup, even if previously saved.
+            _awaitingName = true;
             InitializeComponent();
             AudioPlayer.PlayGreeting();
             UpdateInputHint();
@@ -33,7 +34,14 @@ namespace CyberSecurityChatbot
             if (_awaitingName)
             {
                 HistoryTextBox.AppendText("Welcome to the Cybersecurity Awareness Bot!\r\n");
-                HistoryTextBox.AppendText("Please enter your name so I can personalise answers and remember your interests.\r\n");
+                if (!string.IsNullOrWhiteSpace(_user.Name))
+                {
+                    HistoryTextBox.AppendText($"I have a saved name: {_user.Name}. Press Send (leave blank) to keep it, or type a new name.\r\n");
+                }
+                else
+                {
+                    HistoryTextBox.AppendText("Please enter your name so I can personalise answers and remember your interests.\r\n");
+                }
                 HistoryTextBox.AppendText("Ask about passwords, phishing, malware, VPNs, privacy, or safe browsing." + "\r\n");
             }
             else
@@ -88,7 +96,24 @@ namespace CyberSecurityChatbot
 
             if (_awaitingName)
             {
-                _user.Name = text;
+                // If user enters a name, use it. If empty and a saved name exists, keep saved name.
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    if (string.IsNullOrWhiteSpace(_user.Name))
+                    {
+                        // Force the user to provide a name if none is saved.
+                        HistoryTextBox.AppendText("Bot: Please enter your name before continuing.\r\n");
+                        InputTextBox.Clear();
+                        InputTextBox.Focus();
+                        return;
+                    }
+                    // keep existing saved name
+                }
+                else
+                {
+                    _user.Name = text;
+                }
+
                 _awaitingName = false;
                 UpdateInputHint();
                 HistoryTextBox.AppendText($"Bot: Nice to meet you, {_user.Name}! I can answer questions about passwords, phishing, malware, VPNs, privacy, and safe browsing.\r\n");

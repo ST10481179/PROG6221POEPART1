@@ -46,23 +46,31 @@ namespace CyberSecurityChatbot
 
         private void AskUserName()
         {
-            // If a name is already present (loaded from persistence), skip prompting
-            if (!string.IsNullOrWhiteSpace(_user.Name))
-            {
-                TypingWrite($"Nice to meet you back, {_user.Name}! I’m ready when you are.");
-                return;
-            }
-
+            // Always prompt for the user's name before continuing. If a name is already saved, allow empty input to keep it.
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.Write("What is your name? ");
+                if (!string.IsNullOrWhiteSpace(_user.Name))
+                {
+                    Console.Write($"What is your name? (current: {_user.Name}) [press Enter to keep] ");
+                }
+                else
+                {
+                    Console.Write("What is your name? ");
+                }
                 Console.ResetColor();
-                var input = Console.ReadLine()?.Trim() ?? string.Empty;
+                var input = Console.ReadLine() ?? string.Empty;
+                input = input.Trim();
 
                 if (!string.IsNullOrWhiteSpace(input))
                 {
                     _user.Name = input;
+                    return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(_user.Name))
+                {
+                    TypingWrite($"Nice to meet you back, {_user.Name}! I’m ready when you are.");
                     return;
                 }
 
