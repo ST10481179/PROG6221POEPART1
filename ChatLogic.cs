@@ -87,7 +87,7 @@ namespace CyberSecurityChatbot
             var sentiment = DetectSentiment(normalized);
             var topic = DetermineTopic(normalized);
             TryCaptureInterest(user, normalized, topic);
-            TryStoreMemory(user, normalized);
+            TryStoreMemory(user, text);
 
             string response;
             if (normalized.Contains("how are you"))
@@ -179,11 +179,48 @@ namespace CyberSecurityChatbot
             }
         }
 
-        private static void TryStoreMemory(User user, string normalized)
+        private static void TryStoreMemory(User user, string originalText)
         {
-            if (normalized.Contains("i work at") || normalized.Contains("my company is") || normalized.Contains("i am a") || normalized.Contains("i'm a"))
+            var normalized = originalText.ToLowerInvariant();
+
+            string ExtractAfter(string marker)
             {
-                user.Remember(normalized);
+                var idx = normalized.IndexOf(marker, System.StringComparison.Ordinal);
+                if (idx >= 0)
+                {
+                    var start = idx + marker.Length;
+                    if (start < originalText.Length)
+                    {
+                        var segment = originalText.Substring(start).Trim();
+                        // Trim trailing punctuation
+                        segment = segment.Trim().TrimEnd('.', ',', '!','?');
+                        return segment;
+                    }
+                }
+
+                return string.Empty;
+            }
+
+            if (normalized.Contains("i work at"))
+            {
+                var company = ExtractAfter("i work at");
+                if (!string.IsNullOrWhiteSpace(company)) user.Remember($"Works at {company}");
+                return;
+            }
+
+            if (normalized.Contains("my company is"))
+            {
+                var company = ExtractAfter("my company is");
+                if (!string.IsNullOrWhiteSpace(company)) user.Remember($"Works at {company}");
+                return;
+            }
+
+            if (normalized.Contains("i am a") || normalized.Contains("i'm a"))
+            {
+                var marker = normalized.Contains("i am a") ? "i am a" : "i'm a";
+                var role = ExtractAfter(marker);
+                if (!string.IsNullOrWhiteSpace(role)) user.Remember($"Role: {role}");
+                return;
             }
         }
 

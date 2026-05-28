@@ -27,9 +27,12 @@ namespace CyberSecurityChatbot
             }
 
             var trimmed = note.Trim();
-            if (!Memory.Contains(trimmed))
+            // Avoid duplicates (case-insensitive)
+            if (!Memory.Any(m => string.Equals(m, trimmed, System.StringComparison.OrdinalIgnoreCase)))
             {
-                Memory.Add(trimmed);
+                // Store a more readable memory (capitalize first letter)
+                var stored = char.ToUpperInvariant(trimmed[0]) + (trimmed.Length > 1 ? trimmed.Substring(1) : string.Empty);
+                Memory.Add(stored);
                 try
                 {
                     CyberSecurityChatbot.Data.Persistence.SaveUser(this);
