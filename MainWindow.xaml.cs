@@ -60,7 +60,11 @@ namespace CyberSecurityChatbot
             UserNameText.Text = string.IsNullOrWhiteSpace(_user.Name) ? "Not set" : _user.Name;
             LastTopicText.Text = string.IsNullOrWhiteSpace(_user.LastTopic) ? "No topic yet" : _user.LastTopic;
             InterestsText.Text = _user.HasInterests ? string.Join(", ", _user.GetInterestsList()) : "No interests yet";
-            MemorySummaryTextBox.Text = _user.GetMemorySummary();
+            MemoryListBox.Items.Clear();
+            foreach (var m in _user.GetMemoryList())
+            {
+                MemoryListBox.Items.Add(m);
+            }
         }
 
         private void ClearMemories_Click(object sender, RoutedEventArgs e)
@@ -124,6 +128,76 @@ namespace CyberSecurityChatbot
                 UpdateStatusPanel();
                 HistoryTextBox.AppendText("\r\nBot: Cleared interests.\r\n");
                 HistoryTextBox.ScrollToEnd();
+            }
+        }
+
+        private void RemoveMemory_Click(object sender, RoutedEventArgs e)
+        {
+            if (MemoryListBox.SelectedItem == null) return;
+            var selected = MemoryListBox.SelectedItem.ToString();
+            var result = MessageBox.Show($"Remove memory: '{selected}'?", "Confirm Remove", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                var memProp = typeof(User).GetProperty("Memory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                if (memProp != null)
+                {
+                    if (memProp.GetValue(_user) is System.Collections.IList list)
+                    {
+                        list.Remove(selected);
+                    }
+                }
+
+                try { CyberSecurityChatbot.Data.Persistence.SaveUser(_user); } catch { }
+                UpdateStatusPanel();
+                HistoryTextBox.AppendText("\r\nBot: Memory removed.\r\n");
+                HistoryTextBox.ScrollToEnd();
+            }
+        }
+
+        private void EditMemory_Click(object sender, RoutedEventArgs e)
+        {
+            if (MemoryListBox.SelectedItem == null) return;
+            var selected = MemoryListBox.SelectedItem.ToString();
+            var dlg = new InputDialog("Edit Memory", selected);
+            if (dlg.ShowDialog() == true)
+            {
+                var newVal = dlg.ResponseText.Trim();
+                if (!string.IsNullOrWhiteSpace(newVal))
+                {
+                    var memProp = typeof(User).GetProperty("Memory", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+                    if (memProp != null)
+                    {
+                        if (memProp.GetValue(_user) is System.Collections.IList list)
+                        {
+                            var idx = list.IndexOf(selected);
+                            if (idx >= 0)
+                            {
+                                list[idx] = newVal;
+                            }
+                        }
+                    }
+
+                    try { CyberSecurityChatbot.Data.Persistence.SaveUser(_user); } catch { }
+                    UpdateStatusPanel();
+                    HistoryTextBox.AppendText("\r\nBot: Memory edited.\r\n");
+                    HistoryTextBox.ScrollToEnd();
+                }
+            }
+        }
+
+        private void AddMemory_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new InputDialog("Add Memory", "");
+            if (dlg.ShowDialog() == true)
+            {
+                var newVal = dlg.ResponseText.Trim();
+                if (!string.IsNullOrWhiteSpace(newVal))
+                {
+                    _user.Remember(newVal);
+                    UpdateStatusPanel();
+                    HistoryTextBox.AppendText("\r\nBot: Memory added.\r\n");
+                    HistoryTextBox.ScrollToEnd();
+                }
             }
         }
 
