@@ -7,6 +7,8 @@ namespace CyberSecurityChatbot
 {
     internal static class AudioPlayer
     {
+        private static SoundPlayer? _player;
+
         [SupportedOSPlatform("windows")]
         public static void PlayGreeting()
         {
@@ -21,8 +23,16 @@ namespace CyberSecurityChatbot
 
             try
             {
-                using var player = new SoundPlayer(path);
-                player.PlaySync();
+                if (_player == null)
+                {
+                    _player = new SoundPlayer(path);
+                }
+                else if (!string.Equals(_player.SoundLocation, path, StringComparison.OrdinalIgnoreCase))
+                {
+                    _player.SoundLocation = path;
+                }
+
+                _player.Play();
             }
             catch (Exception ex)
             {

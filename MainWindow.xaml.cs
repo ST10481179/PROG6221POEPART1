@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace CyberSecurityChatbot
@@ -21,10 +22,16 @@ namespace CyberSecurityChatbot
             // Always ask for the user's name on startup, even if previously saved.
             _awaitingName = true;
             InitializeComponent();
-            AudioPlayer.PlayGreeting();
+            Loaded += MainWindow_Loaded;
             UpdateInputHint();
             InitializeHistory();
             InputTextBox.Focus();
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= MainWindow_Loaded;
+            AudioPlayer.PlayGreeting();
         }
 
         private void InitializeHistory()
@@ -157,7 +164,7 @@ namespace CyberSecurityChatbot
         private void EditMemory_Click(object sender, RoutedEventArgs e)
         {
             if (MemoryListBox.SelectedItem == null) return;
-            var selected = MemoryListBox.SelectedItem.ToString();
+            var selected = MemoryListBox.SelectedItem?.ToString() ?? string.Empty;
             var dlg = new InputDialog("Edit Memory", selected);
             if (dlg.ShowDialog() == true)
             {

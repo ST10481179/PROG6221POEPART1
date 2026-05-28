@@ -31,7 +31,8 @@ namespace CyberSecurityChatbot
             {
                 "Phishing attacks use fake emails and links. Always verify the sender, hover over links, and never share your password.",
                 "Be cautious of unexpected emails demanding action. Scammers often disguise themselves as trusted organisations.",
-                "Check the sender address and look for poor spelling or urgent language. If it seems odd, don't click links."
+                "Check the sender address and look for poor spelling or urgent language. If it seems odd, don't click links.",
+                "Legitimate organisations won't ask for passwords by email. When in doubt, contact them directly instead of responding."
             },
             ["vpn"] = new()
             {
@@ -78,7 +79,7 @@ namespace CyberSecurityChatbot
 
         private static readonly string[] PositiveKeywords = { "good", "great", "happy", "fine", "well", "awesome", "curious" };
         private static readonly string[] NegativeKeywords = { "worried", "upset", "angry", "terrible", "bad", "scared", "afraid", "frustrat", "frustrated", "nervous", "anxious", "confused" };
-        private static readonly string[] InterestMarkers = { "i am interested in", "i'm interested in", "i care about", "i like", "i want to learn about", "i want to know about", "i'm interested in" };
+        private static readonly string[] InterestMarkers = { "i am interested in", "i'm interested in", "i care about", "i like", "i want to learn about", "i want to know about", "i'm interested in", "i am curious about", "i'm curious about" };
         private static readonly string[] FollowUpMarkers = { "tell me more", "another tip", "more about", "explain more", "tell me another", "more", "what else", "give me another tip", "give me another" };
 
         public static string GetResponse(User user, string text)
@@ -90,6 +91,8 @@ namespace CyberSecurityChatbot
             TryStoreMemory(user, text);
 
             string response;
+            var usedTopicResponse = false;
+
             if (normalized.Contains("how are you"))
             {
                 response = "I am fully operational and ready to keep you safe.";
@@ -104,11 +107,13 @@ namespace CyberSecurityChatbot
             }
             else if (IsFollowUp(normalized) && !string.IsNullOrWhiteSpace(user.LastTopic))
             {
-                response = BuildTopicResponse(user, user.LastTopic, true);
+                response = BuildTopicResponse(user, user.LastTopic, true, sentiment);
+                usedTopicResponse = true;
             }
             else if (!string.IsNullOrWhiteSpace(topic))
             {
-                response = BuildTopicResponse(user, topic);
+                response = BuildTopicResponse(user, topic, false, sentiment);
+                usedTopicResponse = true;
             }
             else if (normalized.Contains("help"))
             {
@@ -132,13 +137,16 @@ namespace CyberSecurityChatbot
                 }
             }
 
-            if (sentiment == Sentiment.Negative && !normalized.Contains("how are you"))
+            if (!usedTopicResponse)
             {
-                response = "It's completely understandable to feel that way. " + response;
-            }
-            else if (sentiment == Sentiment.Positive && !normalized.Contains("how are you"))
-            {
-                response = "I'm glad you're feeling positive. " + response;
+                if (sentiment == Sentiment.Negative && !normalized.Contains("how are you"))
+                {
+                    response = "It's completely understandable to feel that way. " + response;
+                }
+                else if (sentiment == Sentiment.Positive && !normalized.Contains("how are you"))
+                {
+                    response = "I'm glad you're feeling positive. " + response;
+                }
             }
 
             return response;
@@ -224,7 +232,7 @@ namespace CyberSecurityChatbot
             }
         }
 
-        private static string BuildTopicResponse(User user, string topic, bool followUp = false)
+        private static string BuildTopicResponse(User user, string topic, bool followUp, Sentiment sentiment)
         {
             if (!TopicResponses.TryGetValue(topic, out var responses) || responses.Count == 0)
             {
@@ -232,11 +240,27 @@ namespace CyberSecurityChatbot
             }
 
             user.LastTopic = topic;
-            var response = responses[Random.Next(responses.Count)];
+            var index = 0;
+            if (user.TopicResponseIndexes.TryGetValue(topic, out var lastIndex))
+            {
+                index = lastIndex;
+            }
+
+            var response = responses[index];
+            user.TopicResponseIndexes[topic] = (index + 1) % responses.Count;
 
             if (followUp)
             {
                 response = "Here is another tip: " + response;
+            }
+
+            if (sentiment == Sentiment.Negative)
+            {
+                response = "I understand your concern. " + response;
+            }
+            else if (sentiment == Sentiment.Positive)
+            {
+                response = "That's great that you're exploring this topic. " + response;
             }
 
             return response;

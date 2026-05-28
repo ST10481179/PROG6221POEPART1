@@ -11,6 +11,8 @@ namespace CyberSecurityChatbot
 
         public List<string> Interests { get; } = new();
 
+        public Dictionary<string, int> TopicResponseIndexes { get; } = new();
+
         public string LastTopic { get; set; } = string.Empty;
 
         public string FavoriteTopic { get; set; } = string.Empty;
