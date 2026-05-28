@@ -6,16 +6,53 @@ namespace CyberSecurityChatbot
     internal partial class MainWindow : Window
     {
         private readonly User _user;
-        private bool _awaitingName = true;
+        private bool _awaitingName;
+
+        private const string AsciiArt =
+            "   ____ _       _                 ____        _   \r\n" +
+            "  / ___| | ___ | |__   ___  _ __ / ___|  ___ | |_ \r\n" +
+            " | |   | |/ _ \\| '_ \\ / _ \\| '__| |  _  / _ \\| __|\r\n" +
+            " | |___| | (_) | |_) | (_) | |  | |_| || (_) | |_ \r\n" +
+            "  \\____|_|\\___/|_.__/ \\___/|_|   \\____| \\___/ \\__|";
 
         public MainWindow(User user)
         {
             _user = user;
+            _awaitingName = !user.HasName;
             InitializeComponent();
             AudioPlayer.PlayGreeting();
             UpdateInputHint();
-            HistoryTextBox.Text = "Welcome to the Cybersecurity Awareness Bot!\r\n" +
-                "Please enter your name so I can personalize your experience.\r\n";
+            InitializeHistory();
+            InputTextBox.Focus();
+        }
+
+        private void InitializeHistory()
+        {
+            HistoryTextBox.Text = AsciiArt + "\r\n\r\n";
+
+            if (_awaitingName)
+            {
+                HistoryTextBox.AppendText("Welcome to the Cybersecurity Awareness Bot!\r\n");
+                HistoryTextBox.AppendText("Please enter your name so I can personalise answers and remember your interests.\r\n");
+                HistoryTextBox.AppendText("Ask about passwords, phishing, malware, VPNs, privacy, or safe browsing." + "\r\n");
+            }
+            else
+            {
+                HistoryTextBox.AppendText($"Welcome back, {_user.Name}!\r\n");
+                HistoryTextBox.AppendText(_user.GetMemorySummary() + "\r\n");
+                HistoryTextBox.AppendText("Ask another cybersecurity question or say 'help' for examples.\r\n");
+            }
+
+            UpdateStatusPanel();
+            HistoryTextBox.ScrollToEnd();
+        }
+
+        private void UpdateStatusPanel()
+        {
+            UserNameText.Text = string.IsNullOrWhiteSpace(_user.Name) ? "Not set" : _user.Name;
+            LastTopicText.Text = string.IsNullOrWhiteSpace(_user.LastTopic) ? "No topic yet" : _user.LastTopic;
+            InterestsText.Text = _user.HasInterests ? string.Join(", ", _user.GetInterestsList()) : "No interests yet";
+            MemorySummaryTextBox.Text = _user.GetMemorySummary();
         }
 
         private void InputTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -32,6 +69,13 @@ namespace CyberSecurityChatbot
             SendMessage();
         }
 
+        private void HelpButton_Click(object sender, RoutedEventArgs e)
+        {
+            HistoryTextBox.AppendText("\r\nBot: Ask me about passwords, phishing, malware, VPNs, privacy, or safe browsing.\r\n");
+            HistoryTextBox.AppendText("Try: 'Tell me about password safety', 'Give me another tip', or 'I'm interested in privacy'.\r\n");
+            HistoryTextBox.ScrollToEnd();
+        }
+
         private void SendMessage()
         {
             var text = InputTextBox.Text?.Trim();
@@ -40,22 +84,24 @@ namespace CyberSecurityChatbot
                 return;
             }
 
-            var senderName = _awaitingName ? "You" : (string.IsNullOrWhiteSpace(_user.Name) ? "You" : _user.Name);
-            HistoryTextBox.AppendText($"\r\n{senderName}: {text}\r\n");
+            HistoryTextBox.AppendText($"\r\nYou: {text}\r\n");
 
             if (_awaitingName)
             {
                 _user.Name = text;
                 _awaitingName = false;
                 UpdateInputHint();
-                HistoryTextBox.AppendText($"Bot: Nice to meet you, {_user.Name}! I can answer questions about passwords, phishing, malware, VPNs, privacy, and safe browsing. You can also ask for another tip or tell me what you’re interested in.\r\n");
+                HistoryTextBox.AppendText($"Bot: Nice to meet you, {_user.Name}! I can answer questions about passwords, phishing, malware, VPNs, privacy, and safe browsing.\r\n");
                 InputTextBox.Clear();
+                UpdateStatusPanel();
                 HistoryTextBox.ScrollToEnd();
                 return;
             }
 
-            HistoryTextBox.AppendText($"Bot: {ChatLogic.GetResponse(_user, text)}\r\n");
+            var response = ChatLogic.GetResponse(_user, text);
+            HistoryTextBox.AppendText($"Bot: {response}\r\n");
             InputTextBox.Clear();
+            UpdateStatusPanel();
             HistoryTextBox.ScrollToEnd();
         }
 

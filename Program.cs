@@ -63,20 +63,10 @@ namespace CyberSecurityChatbot
 
             var user = new User
             {
-                Name = saved.Name ?? string.Empty,
-                LastTopic = saved.LastTopic ?? string.Empty,
-                FavoriteTopic = saved.FavoriteTopic ?? string.Empty
+                Name = saved.Name ?? string.Empty
             };
 
-            foreach (var memory in saved.Memory ?? new System.Collections.Generic.List<string>())
-            {
-                user.Remember(memory);
-            }
-
-            foreach (var interest in saved.Interests ?? new System.Collections.Generic.List<string>())
-            {
-                user.RememberInterest(interest);
-            }
+            user.RestoreState(saved.Memory, saved.Interests, saved.FavoriteTopic ?? string.Empty, saved.LastTopic ?? string.Empty);
 
             return user;
         }

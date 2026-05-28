@@ -46,6 +46,13 @@ namespace CyberSecurityChatbot
 
         private void AskUserName()
         {
+            // If a name is already present (loaded from persistence), skip prompting
+            if (!string.IsNullOrWhiteSpace(_user.Name))
+            {
+                TypingWrite($"Nice to meet you back, {_user.Name}! I’m ready when you are.");
+                return;
+            }
+
             while (true)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;

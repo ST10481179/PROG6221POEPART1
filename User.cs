@@ -30,6 +30,14 @@ namespace CyberSecurityChatbot
             if (!Memory.Contains(trimmed))
             {
                 Memory.Add(trimmed);
+                try
+                {
+                    CyberSecurityChatbot.Data.Persistence.SaveUser(this);
+                }
+                catch
+                {
+                    // Fail silently if persistence is not available
+                }
             }
         }
 
@@ -49,6 +57,14 @@ namespace CyberSecurityChatbot
             FavoriteTopic = trimmed;
 
             Remember($"Interested in {trimmed}");
+            try
+            {
+                CyberSecurityChatbot.Data.Persistence.SaveUser(this);
+            }
+            catch
+            {
+                // ignore persistence errors
+            }
         }
 
         public string GetMemorySummary()
@@ -73,6 +89,31 @@ namespace CyberSecurityChatbot
         public System.Collections.Generic.IEnumerable<string> GetInterestsList()
         {
             return Interests;
+        }
+
+        internal void RestoreState(System.Collections.Generic.IEnumerable<string> memory, System.Collections.Generic.IEnumerable<string> interests, string favoriteTopic, string lastTopic)
+        {
+            Memory.Clear();
+            Interests.Clear();
+
+            foreach (var note in memory ?? System.Array.Empty<string>())
+            {
+                if (!string.IsNullOrWhiteSpace(note) && !Memory.Contains(note))
+                {
+                    Memory.Add(note);
+                }
+            }
+
+            foreach (var interest in interests ?? System.Array.Empty<string>())
+            {
+                if (!string.IsNullOrWhiteSpace(interest) && !Interests.Contains(interest))
+                {
+                    Interests.Add(interest);
+                }
+            }
+
+            FavoriteTopic = favoriteTopic ?? string.Empty;
+            LastTopic = lastTopic ?? string.Empty;
         }
     }
 }
