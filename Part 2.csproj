@@ -16,6 +16,9 @@
 
   <ItemGroup>
     <None Include="App.xaml" />
+    <None Include="Greeting.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Resource Include="Screenshot 2026-05-25 071115.png" />
   </ItemGroup>
 
