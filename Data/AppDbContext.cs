@@ -16,8 +16,8 @@ namespace CyberSecurityChatbot.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             var listConverter = new ValueConverter<List<string>, string>(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                v => string.IsNullOrEmpty(v) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(v) ?? new List<string>());
+                v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                v => string.IsNullOrEmpty(v) ? new List<string>() : JsonSerializer.Deserialize<List<string>>(v, new JsonSerializerOptions()) ?? new List<string>());
 
             modelBuilder.Entity<Entities.UserEntity>(b =>
             {
