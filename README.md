@@ -31,9 +31,9 @@ dotnet run --project "CyberSecurityChatbot.csproj" -c Debug -- -console
 - Automatic database migrations on startup
 - Optional audio greeting playback when `Greeting.wav` is present
 
-## YouTube Demo
+## YouTube link
 
-YouTube: <PLACEHOLDER_FOR_YOUTUBE_LINK>
+YouTube: 
 
 
 
