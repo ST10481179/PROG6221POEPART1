@@ -153,6 +153,13 @@ namespace CyberSecurityChatbot
         {
             var normalized = text.ToLowerInvariant();
 
+            if (normalized.Contains("show more") && !_quizMode)
+            {
+                LogTextBox.Text = _activityLogger.GetFullLog();
+                ShowMoreLogButton.IsEnabled = false;
+                return "Here is the full activity history.";
+            }
+
             if (_quizMode)
             {
                 if (normalized.Contains("exit quiz") || normalized.Contains("cancel quiz"))
@@ -173,13 +180,12 @@ namespace CyberSecurityChatbot
 
             if (normalized.Contains("show activity log") || normalized.Contains("what have you done") || normalized.Contains("show log") || normalized.Contains("recent actions") || normalized.Contains("what did you do"))
             {
-                MainTabControl.SelectedIndex = 3;
-                UpdateLogView();
-                return "Here\'s a summary of recent actions:\r\n" + LogTextBox.Text;
+                return HandleShowActivityLogIntent(text);
             }
 
             if (normalized.Contains("start quiz") || normalized.Contains("take quiz") || normalized.Contains("test my knowledge") || normalized.Contains("quiz me") || normalized.Contains("play the game"))
             {
+                _activityLogger.Log($"NLP recognised quiz intent from: '{text}'");
                 StartQuiz();
                 return "Starting the cybersecurity quiz now.";
             }
@@ -204,6 +210,7 @@ namespace CyberSecurityChatbot
 
         private string HandleTaskAddIntent(string text)
         {
+            _activityLogger.Log($"NLP recognised task intent from: '{text}'");
             var normalized = text.ToLowerInvariant();
             var title = ExtractTaskTitle(text, normalized);
             if (string.IsNullOrWhiteSpace(title))
@@ -222,6 +229,7 @@ namespace CyberSecurityChatbot
 
         private string HandleReminderIntent(string text)
         {
+            _activityLogger.Log($"NLP recognised reminder intent from: '{text}'");
             if (!_awaitingReminder || _pendingTaskId == 0)
             {
                 return "What task would you like me to remind you about?";
@@ -238,6 +246,14 @@ namespace CyberSecurityChatbot
             _awaitingReminder = false;
             RefreshTaskList();
             return $"Got it! I\'ll remind you on {reminder}.";
+        }
+
+        private string HandleShowActivityLogIntent(string text)
+        {
+            MainTabControl.SelectedIndex = 3;
+            UpdateLogView();
+            _activityLogger.Log($"NLP recognised log intent from: '{text}'");
+            return "Here's a summary of recent actions:\r\n" + LogTextBox.Text;
         }
 
         private void StartQuiz()
@@ -265,8 +281,14 @@ namespace CyberSecurityChatbot
                 }
             }
 
+            var currentIndex = _quizManager.CurrentIndex;
             var correct = _quizManager.SubmitAnswer(selected);
             var feedback = _quizManager.GetFeedback(correct);
+            if (currentIndex == _quizManager.TotalQuestions - 1)
+            {
+                _quizManager.Advance();
+            }
+
             if (_quizManager.IsFinished())
             {
                 _activityLogger.Log($"Quiz completed - score: {_quizManager.GetFinalScore()} out of {_quizManager.TotalQuestions}");
@@ -629,6 +651,16 @@ namespace CyberSecurityChatbot
                 UpdateStatusPanel();
                 HistoryTextBox.ScrollToEnd();
                 return;
+            }
+
+            var topic = ChatLogic.DetectTopic(text);
+            if (!string.IsNullOrWhiteSpace(topic))
+            {
+                _activityLogger.Log($"Keyword matched: {topic} - response delivered");
+            }
+            else if (ChatLogic.IsFollowUpMessage(text))
+            {
+                _activityLogger.Log($"Keyword matched: follow-up - response delivered");
             }
 
             var response = ChatLogic.GetResponse(_user, text);

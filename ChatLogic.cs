@@ -152,6 +152,16 @@ namespace CyberSecurityChatbot
             return response;
         }
 
+        public static string DetectTopic(string text)
+        {
+            return DetermineTopic(text.ToLowerInvariant());
+        }
+
+        public static bool IsFollowUpMessage(string text)
+        {
+            return IsFollowUp(text.ToLowerInvariant());
+        }
+
         private static string DetermineTopic(string normalized)
         {
             foreach (var pair in TopicKeywords)
