@@ -10,3 +10,5 @@ obj/
 GeneratedAssets/
 chatbot.db
 *.db
+*.db-shm
+*.db-wal
