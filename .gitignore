@@ -5,6 +5,7 @@ obj/
 *.cache
 *.log
 .vscode/
+.vs/
 **/bin/
 **/obj/
 GeneratedAssets/

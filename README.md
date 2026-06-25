@@ -1,39 +1,49 @@
-# CyberSecurityChatbot
+# PROG6221 POE Part 3 — CyberSecurity Chatbot
 
-A simple WPF/.NET chatbot that provides cybersecurity tips about passwords, phishing, malware, VPNs, privacy, and safe browsing.
+This repository contains the Part 3 version of the CyberSecurity Chatbot WPF application. The app delivers cybersecurity advice through a desktop GUI, remembers user data with SQLite, and supports interactive follow-up prompts.
+
+## Requirements
+
+- .NET 10 SDK
+- Visual Studio 2022 or Visual Studio Code
+- Windows with WPF support
 
 ## Run
 
-Build and run from the project folder:
+From the repository root:
 
 ```powershell
-# build
-dotnet build "CyberSecurityChatbot.csproj" -c Debug
+# build the solution
+dotnet build "CyberSecurityChatbot.sln" -c Debug
 
-# run GUI (default)
+# run the app using the solution project
 dotnet run --project "CyberSecurityChatbot.csproj" -c Debug
-
-# run console mode
-dotnet run --project "CyberSecurityChatbot.csproj" -c Debug -- -console
 ```
+
+## Project layout
+
+- `CyberSecurityChatbot.sln` — main solution
+- `CyberSecurityChatbot.csproj` — WPF application project
+- `App.xaml`, `MainWindow.xaml` — WPF startup and UI
+- `Chatbot.cs`, `ChatLogic.cs` — chatbot behavior and response logic
+- `Data/`, `Entities/`, `Migrations/` — EF Core persistence structure
+- `Greeting.wav` — optional startup greeting audio
 
 ## Features
 
-- Neat WPF GUI with helpful prompt design and clean layout
-- Keyboard shortcut support (Enter to send)
-- Personalised responses using the user's name and favourite topic
-- Keyword recognition for cybersecurity topics like password, scam, phishing, privacy, VPN, and malware
-- Random topic responses to keep answers varied and engaging
-- Follow-up handling for requests such as "give me another tip" or "tell me more"
-- Sentiment-aware responses for positive and negative user tone
-- Memory recall for interests and past details shared by the user
-- EF Core + SQLite persistence for remembering user data between runs
-- Automatic database migrations on startup
-- Optional audio greeting playback when `Greeting.wav` is present
+- WPF desktop UI for chatbot interaction
+- Interactive keyword and follow-up handling
+- Personalization with user name and favorite topic
+- EF Core + SQLite data persistence
+- Automatic database migration on startup
+- Optional greeting audio playback
 
-## YouTube link
+## Clean repository rules
 
-YouTube: https://youtu.be/UHyt3NHFMyQ 
+- `bin/` and `obj/` build outputs are excluded from git
+- SQLite database files are ignored
+- Temporary database journal files (`*.db-shm`, `*.db-wal`) are ignored
+- The repository keeps only source, project, and solution files for Part 3
 
 
 
