@@ -33,7 +33,6 @@ dotnet run --project "CyberSecurityChatbot.csproj" -c Debug -- -console
 
 ## YouTube link
 
-YouTube: https://youtu.be/UHyt3NHFMyQ 
-
+YouTube: https://youtu.be/UHyt3NHFMyQ
 
 
