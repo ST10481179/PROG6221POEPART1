@@ -22,29 +22,6 @@ This project is the final Part 3 submission for PROG6221. It builds on the exist
 - Keyword matching, follow-up handling, and sentiment-aware chatbot responses
 - Optional audio greeting playback using `Greeting.wav`
 
-## Requirements
-
-- Visual Studio 2022 or Visual Studio Code
-- .NET 10 SDK
-- Installed NuGet packages:
-  - `Microsoft.EntityFrameworkCore`
-  - `Microsoft.EntityFrameworkCore.Sqlite`
-  - `Microsoft.EntityFrameworkCore.Proxies`
-  - `Microsoft.EntityFrameworkCore.Tools`
-
-## Setup and Run
-
-1. Open `CyberSecurityChatbot.sln` in Visual Studio 2022 or your editor.
-2. Restore NuGet packages.
-3. Ensure `Greeting.wav` is present in the project root to enable the audio greeting.
-4. Build the solution.
-5. Run the project from `CyberSecurityChatbot.csproj`.
-
-```powershell
-dotnet build "CyberSecurityChatbot.sln" -c Debug
-dotnet run --project "CyberSecurityChatbot.csproj" -c Debug
-```
-
 ## Database
 
 The application stores tasks and activity log entries in `database.db` in the project folder. The database is created automatically when the app runs.
