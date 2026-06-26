@@ -55,6 +55,8 @@ The application stores tasks and activity log entries in `database.db` in the pr
 - Cybersecurity quiz game with 10+ questions, immediate feedback, and final score
 - NLP-style intent detection for varied user phrases
 - Activity log with recent action history and show more support
+##  GitHub Actions:
+<img width="1407" height="857" alt="green " src="https://github.com/user-attachments/assets/10d31bef-0b61-4a5b-8866-4bfcea7e8ba2" />
 
 ## YouTube Link
 
