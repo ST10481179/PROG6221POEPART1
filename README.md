@@ -1,4 +1,4 @@
- # Student Number: ST1481179
+ # Student Number: ST10481179
 # CyberSecurityChatbot — Part 3 Submission
 
 A WPF GUI application that extends the Part 2 cybersecurity chatbot with a Task Assistant, Quiz game, NLP-style intent recognition, and Activity Log.
@@ -56,6 +56,7 @@ The application stores tasks and activity log entries in `database.db` in the pr
 - NLP-style intent detection for varied user phrases
 - Activity log with recent action history and show more support
 ##  GitHub Actions:
+
 <img width="1407" height="857" alt="green " src="https://github.com/user-attachments/assets/10d31bef-0b61-4a5b-8866-4bfcea7e8ba2" />
 
 ## YouTube Link
