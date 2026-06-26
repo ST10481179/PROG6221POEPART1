@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CyberSecurityChatbot
 {
@@ -79,7 +80,7 @@ namespace CyberSecurityChatbot
 
         private static readonly string[] PositiveKeywords = { "good", "great", "happy", "fine", "well", "awesome", "curious" };
         private static readonly string[] NegativeKeywords = { "worried", "upset", "angry", "terrible", "bad", "scared", "afraid", "frustrat", "frustrated", "nervous", "anxious", "confused" };
-        private static readonly string[] InterestMarkers = { "i am interested in", "i'm interested in", "i care about", "i like", "i want to learn about", "i want to know about", "i'm interested in", "i am curious about", "i'm curious about" };
+        private static readonly string[] InterestMarkers = { "i am interested in", "i'm interested in", "i am curious about", "i'm curious about", "i care about", "i like", "i love", "i want to learn about", "i want to know about", "i'm into", "i am into", "i'm passionate about", "i am passionate about", "i'm keen on", "i am keen on", "my interest is", "my interests are", "my favourite topic is", "my favorite topic is" };
         private static readonly string[] FollowUpMarkers = { "tell me more", "another tip", "more about", "explain more", "tell me another", "more", "what else", "give me another tip", "give me another" };
 
         public static string GetResponse(User user, string text)
@@ -87,7 +88,7 @@ namespace CyberSecurityChatbot
             var normalized = text.ToLowerInvariant();
             var sentiment = DetectSentiment(normalized);
             var topic = DetermineTopic(normalized);
-            TryCaptureInterest(user, normalized, topic);
+            TryCaptureInterest(user, text, normalized, topic);
             TryStoreMemory(user, text);
 
             string response;
@@ -180,21 +181,75 @@ namespace CyberSecurityChatbot
             return FollowUpMarkers.Any(marker => normalized.Contains(marker));
         }
 
-        private static void TryCaptureInterest(User user, string normalized, string explicitTopic)
+        private static void TryCaptureInterest(User user, string originalText, string normalized, string explicitTopic)
         {
-            if (InterestMarkers.Any(marker => normalized.Contains(marker)))
+            if (!InterestMarkers.Any(marker => normalized.Contains(marker)))
             {
-                var interestTopic = explicitTopic;
-                if (string.IsNullOrWhiteSpace(interestTopic))
+                return;
+            }
+
+            var interestTopic = ExtractInterestTopic(originalText, normalized, explicitTopic);
+            if (!string.IsNullOrWhiteSpace(interestTopic))
+            {
+                user.RememberInterest(interestTopic);
+            }
+        }
+
+        private static string ExtractInterestTopic(string originalText, string normalized, string explicitTopic)
+        {
+            if (!string.IsNullOrWhiteSpace(explicitTopic))
+            {
+                return explicitTopic;
+            }
+
+            foreach (var marker in InterestMarkers)
+            {
+                var markerIndex = normalized.IndexOf(marker, StringComparison.Ordinal);
+                if (markerIndex < 0)
                 {
-                    interestTopic = DetermineTopic(normalized);
+                    continue;
                 }
 
-                if (!string.IsNullOrWhiteSpace(interestTopic))
+                var start = markerIndex + marker.Length;
+                if (start >= originalText.Length)
                 {
-                    user.RememberInterest(interestTopic);
+                    continue;
+                }
+
+                var segment = originalText.Substring(start).Trim();
+                segment = segment.Trim().TrimEnd('.', ',', '!', '?', ':', ';');
+                var topic = NormalizeInterestTopic(segment);
+                if (!string.IsNullOrWhiteSpace(topic))
+                {
+                    return topic;
                 }
             }
+
+            return string.Empty;
+        }
+
+        private static string NormalizeInterestTopic(string topic)
+        {
+            if (string.IsNullOrWhiteSpace(topic))
+            {
+                return string.Empty;
+            }
+
+            var cleaned = topic.Trim();
+            cleaned = cleaned.TrimStart('"', '\'', '(');
+            cleaned = cleaned.TrimEnd('"', '\'', ')', '.', ',', '!', '?', ':', ';');
+            cleaned = Regex.Replace(cleaned, @"\s+", " ");
+            cleaned = cleaned.Replace(" and ", " ").Replace(" or ", " ").Replace(" / ", " ");
+            cleaned = cleaned.Replace(" about ", " ").Replace(" the ", " ").Replace(" a ", " ").Replace(" an ", " ");
+
+            var normalized = cleaned.Trim().ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                return string.Empty;
+            }
+
+            var canonicalTopic = DetermineTopic(normalized);
+            return string.IsNullOrWhiteSpace(canonicalTopic) ? normalized : canonicalTopic;
         }
 
         private static void TryStoreMemory(User user, string originalText)

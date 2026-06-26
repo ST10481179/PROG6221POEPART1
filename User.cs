@@ -54,7 +54,8 @@ namespace CyberSecurityChatbot
             }
 
             var trimmed = interest.Trim();
-            if (!Interests.Contains(trimmed))
+            var canonical = trimmed.ToLowerInvariant();
+            if (!Interests.Any(existing => string.Equals(existing, canonical, System.StringComparison.OrdinalIgnoreCase)))
             {
                 Interests.Add(trimmed);
             }
