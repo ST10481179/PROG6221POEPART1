@@ -61,6 +61,6 @@ The application stores tasks and activity log entries in `database.db` in the pr
 
 ## YouTube Link
 
-YouTube: 
+YouTube: https://youtu.be/ut2iIpXAJi8 
 
 
